@@ -2,6 +2,7 @@
 #include <SDL.h> 
 #include <vector> 
 #define WINDOW_SIZE 1000
+#define round(x) floor(x + 0.5f)
 
 using namespace std;
 
@@ -64,29 +65,30 @@ void line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2)
     SDL_RenderPresent(renderer);
 }
 
-//void line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2)
-//{
-//    int x, y;
-//    int dx = x2 - x1;
-//    int dy = y2 - y1;
-//    int d = (dy * 2) - dx;
-//    int d1 = dy * 2;
-//    int d2 = (dy - dx) * 4;
-//    x = x1;
-//    y = y1;
-//    SDL_RenderDrawPoint(renderer, x1, y1);
-//    SDL_RenderDrawPoint(renderer, x2, y2);
-//    while (x < x2) {
-//        x++;
-//        if (d < 0)
-//            d += d1;
-//        else {
-//            y++;
-//            d += d2;
-//        }
-//        SDL_RenderDrawPoint(renderer, x, y);
-//    }
-//}
+void line_SDL(SDL_Renderer* renderer, float x1, float y1, float x2, float y2)
+{
+    int iX1 = roundf(x1);
+    int iY1 = roundf(y1);
+    int iX2 = roundf(x2);
+    int iY2 = roundf(y2);
+    int deltaX = abs(iX1 - iX2);
+    int deltaY = abs(iY1 - iY2);
+    int len = fmax(deltaX, deltaY);
+    if (len == 0) {
+        SDL_RenderDrawPoint(renderer, iX1, iY1);
+        return;
+    }
+    double dx = (x2 - x1) / len;
+    double dy = (y2 - y1) / len;
+    double x = x1;
+    double y = y1;
+    len++;
+    while (len--) {
+        x += dx;
+        y += dy;
+        SDL_RenderDrawPoint(renderer, roundf(x), roundf(y));
+    }
+}
 
 int main(int argc, char* args[])
 {
@@ -94,14 +96,26 @@ int main(int argc, char* args[])
     SDL_Window* window;
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_CreateWindowAndRenderer(WINDOW_SIZE, WINDOW_SIZE, 0, &window, &renderer);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-    line(renderer, 500, 100, 600, 500);
+    SDL_SetRenderDrawColor(renderer, 139, 0, 255, 0);
+    /*line(renderer, 500, 100, 600, 500);
     line(renderer, 400, 500, 500, 100);
     it_horizontalLine(renderer, 300, 200, 400);
     line(renderer, 300, 200, 600, 500);
-    line(renderer, 400, 500, 700, 200);
+    line(renderer, 400, 500, 700, 200);*/
+    line_SDL(renderer, 500, 500, 400, 500);
+    line_SDL(renderer, 500, 500, 600, 500);
+    line_SDL(renderer, 500, 500, 500, 400);
+    line_SDL(renderer, 500, 500, 500, 600);
+    line_SDL(renderer, 500, 500, 430, 470);
+    line_SDL(renderer, 500, 500, 570, 530);
+    line_SDL(renderer, 500, 500, 470, 430);
+    line_SDL(renderer, 500, 500, 530, 570);
+    line_SDL(renderer, 500, 500, 530, 430);
+    line_SDL(renderer, 500, 500, 470, 570);
+    line_SDL(renderer, 500, 500, 430, 530);
+    line_SDL(renderer, 500, 500, 570, 470);
 
     SDL_RenderPresent(renderer);
-    SDL_Delay(5000);
+    SDL_Delay(10000);
     return 0;
 }
